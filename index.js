@@ -27,6 +27,12 @@ const persons = [
 
 app.get("/", (req, res) => res.send("Hello Full Stack Open 2022!"));
 
+app.get("/info", (req, res) => {
+  const date = new Date();
+  const info = `<p>Phonebook has info for ${persons.length} people</p> <p>${date}</p>`;
+  res.send(info);
+});
+
 app.get("/api/persons", (req, res) => {
   res.json(persons);
 });
