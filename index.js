@@ -25,6 +25,22 @@ let persons = [
   },
 ];
 
+app.use(express.json());
+app.post("/api/persons", (req, res) => {
+  const body = req.body;
+  console.log("body", body);
+  const person = {
+    id: Math.floor(Math.random() * 100000),
+    name: body.name,
+    number: body.number,
+  };
+
+  console.log("person", person);
+  persons = persons.concat(person);
+  console.log("persons", person.name);
+  res.json(person);
+});
+
 app.get("/", (req, res) => res.send("Hello Full Stack Open 2022!"));
 
 app.get("/info", (req, res) => {
