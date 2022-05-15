@@ -34,7 +34,13 @@ const isNameTaken = (name) => names.includes(name.toLocaleLowerCase());
 // Check if a name arlready exists
 
 app.use(express.json());
-app.use(morgan("tiny"));
+morgan.token("res-body", (req, res) => JSON.stringify(req.body));
+app.use(
+  morgan(
+    ":method :url :status :res[content-length] - :response-time ms :res-body"
+  )
+);
+// app.use(morgan("tiny"));
 
 app.post("/api/persons", (req, res) => {
   const { name, number } = req.body;
