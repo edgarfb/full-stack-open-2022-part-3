@@ -1,4 +1,5 @@
 const express = require("express");
+const morgan = require("morgan");
 const app = express();
 const port = 3001;
 
@@ -33,6 +34,7 @@ const isNameTaken = (name) => names.includes(name.toLocaleLowerCase());
 // Check if a name arlready exists
 
 app.use(express.json());
+app.use(morgan("tiny"));
 
 app.post("/api/persons", (req, res) => {
   const { name, number } = req.body;
