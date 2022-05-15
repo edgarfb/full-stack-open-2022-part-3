@@ -2,7 +2,7 @@ GET http://localhost:3001/api/persons
 
 ###
 
-GET http://localhost:3001/api/persons/2
+GET http://localhost:3001/api/persons/3
 
 ###
 
@@ -11,9 +11,9 @@ DELETE http://localhost:3001/api/persons/2
 ###
 
 POST http://localhost:3001/api/persons
-content-type: application/json
+Content-Type: application/json
 
 {
-  "name": "Julieta Milagros Britez",
-  "number": 14052022
+  "name": "Ferando",
+  "number": 0
 }

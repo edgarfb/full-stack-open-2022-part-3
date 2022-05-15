@@ -25,23 +25,36 @@ let persons = [
   },
 ];
 
+// Check if a name arlready exists
+
+const names = persons.map((person) => person.name.toLocaleLowerCase());
+const isNameTaken = (name) => names.includes(name.toLocaleLowerCase());
+
+// Check if a name arlready exists
+
 app.use(express.json());
+
 app.post("/api/persons", (req, res) => {
-  const body = req.body;
-  console.log("body", body);
+  const { name, number } = req.body;
+  if (!name || !number || typeof number !== "number") {
+    return res.status(400).json({ error: "Name or number missing" });
+  }
+  if (isNameTaken(name)) {
+    return res.status(400).json({ error: "Name must be unique" });
+  }
   const person = {
     id: Math.floor(Math.random() * 100000),
-    name: body.name,
-    number: body.number,
+    name,
+    number,
   };
 
-  console.log("person", person);
   persons = persons.concat(person);
-  console.log("persons", person.name);
   res.json(person);
 });
 
-app.get("/", (req, res) => res.send("Hello Full Stack Open 2022!"));
+app.get("/", (req, res) => {
+  return res.send("Hello Full Stack Open 2022!");
+});
 
 app.get("/info", (req, res) => {
   const date = new Date();
