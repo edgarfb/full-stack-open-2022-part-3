@@ -1,7 +1,9 @@
 const express = require("express");
 const morgan = require("morgan");
+const cors = require("cors");
 const app = express();
-const port = 3001;
+const path = require("path");
+const PORT = process.env.PORT || 5000;
 
 let persons = [
   {
@@ -32,7 +34,7 @@ const names = persons.map((person) => person.name.toLocaleLowerCase());
 const isNameTaken = (name) => names.includes(name.toLocaleLowerCase());
 
 // Check if a name arlready exists
-
+app.use(cors());
 app.use(express.json());
 morgan.token("res-body", (req, res) => JSON.stringify(req.body));
 app.use(
@@ -96,4 +98,4 @@ app.delete("/api/persons/:id", (req, res) => {
   }
 });
 
-app.listen(port, () => console.log(`App listening on port ${port}!`));
+app.listen(PORT, () => console.log(`Listening on ${PORT}`));
