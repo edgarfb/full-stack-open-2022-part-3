@@ -35,6 +35,7 @@ const isNameTaken = (name) => names.includes(name.toLocaleLowerCase());
 
 // Check if a name arlready exists
 app.use(cors());
+app.use(express.static("build"));
 app.use(express.json());
 morgan.token("res-body", (req, res) => JSON.stringify(req.body));
 app.use(
