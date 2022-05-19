@@ -15,39 +15,39 @@ const number = args[4];
 const url = `mongodb+srv://edgarfbFSO:${password}@cluster0.eoy65.mongodb.net/thePhonebookApp?retryWrites=true&w=majority`;
 
 mongoose.connect(url);
-const noteSchema = new mongoose.Schema({
+const personSchema = new mongoose.Schema({
   name: String,
   number: String,
   date: Date,
 });
 
-const Note = mongoose.model("Note", noteSchema);
+const Person = mongoose.model("Person", personSchema);
 
 if (args.length < 4) {
-  Note.find({})
+  Person.find({})
     //   this just return {name: "name", number: "number"}
-    .then((notes) =>
-      notes.map((note) => {
+    .then((persons) =>
+      persons.map((person) => {
         return {
-          name: note.name,
-          number: note.number,
+          name: person.name,
+          number: person.number,
         };
       })
     )
     .then((result) => {
       console.log("Phonebook:");
-      result.forEach((note) => console.log(note.name, note.number));
+      result.forEach((person) => console.log(person.name, person.number));
       mongoose.connection.close();
     });
 }
 if (args.length >= 4 && args.length <= 5) {
-  const note = new Note({
+  const person = new Person({
     name,
     number,
     date: new Date(),
   });
-  note.save().then((result) => {
-    console.log("note saved!");
+  person.save().then((result) => {
+    console.log("Person saved!");
     console.log("result", result);
     mongoose.connection.close();
   });
