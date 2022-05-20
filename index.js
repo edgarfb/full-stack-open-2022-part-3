@@ -3,10 +3,12 @@ const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 const app = express();
-const path = require("path");
 const PORT = process.env.PORT || 5000;
 
 const Person = require("./models/person");
+// const addNewPerson = require("./models/person");
+
+console.log(Person);
 
 // Check if a name arlready exists
 
@@ -62,21 +64,25 @@ app.delete("/api/persons/:id", (req, res) => {
   }
 });
 
-app.post("/api/persons", (req, res) => {
+app.post("/api/persons", async (req, res) => {
   const { name, number } = req.body;
-  if (!name || !number || typeof number !== "number") {
-    return res.status(400).json({ error: "Name or number missing" });
-  }
-  if (isNameTaken(name)) {
-    return res.status(400).json({ error: "Name must be unique" });
-  }
-  const person = {
-    id: Math.floor(Math.random() * 100000),
+  // is this still working???
+  // if (!name || !number || typeof number !== "number") {
+  //   return res.status(400).json({ error: "Name or number missing" });
+  // }
+  // if (isNameTaken(name)) {
+  //   return res.status(400).json({ error: "Name must be unique" });
+  // }
+  const person = new Person({
     name,
     number,
-  };
+    date: new Date(),
+  });
+  person.save().then((result) => {
+    console.log("Person saved!");
+    console.log("result", result);
+  });
 
-  persons = persons.concat(person);
   res.json(person);
 });
 
