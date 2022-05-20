@@ -35,7 +35,9 @@ app.get("/info", (req, res) => {
 });
 
 app.get("/api/persons", (req, res) => {
-  Person.find({}).then((people) => res.json(people));
+  Person.find({})
+    .then((people) => res.json(people))
+    .catch((error) => console.log(error.message));
 });
 
 app.get("/api/persons/:id", (req, res) => {

@@ -1,9 +1,14 @@
 const mongoose = require("mongoose");
-const password = process.env.MONGO_PASS_CLUSTER;
+const url = process.env.MONGO_URI;
 
-const url = `mongodb+srv://edgarfbFSO:${password}@cluster0.eoy65.mongodb.net/thePhonebookApp?retryWrites=true&w=majority`;
-
-mongoose.connect(url);
+mongoose
+  .connect(url)
+  .then((result) => {
+    console.log("Connected to MongoDB");
+  })
+  .catch((error) => {
+    console.log("Error connecting to MongoDB:", error.message);
+  });
 
 const personSchema = new mongoose.Schema({
   name: String,
