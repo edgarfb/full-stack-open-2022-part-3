@@ -1,36 +1,18 @@
+require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 const app = express();
-const path = require("path");
 const PORT = process.env.PORT || 5000;
 
-let persons = [
-  {
-    id: 1,
-    name: "Arto Hellas",
-    number: "040-123456",
-  },
-  {
-    id: 2,
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-  },
-  {
-    id: 3,
-    name: "Dan Abramov",
-    number: "12-43-234345",
-  },
-  {
-    id: 4,
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-  },
-];
+const Person = require("./models/person");
+// const addNewPerson = require("./models/person");
+
+console.log(Person);
 
 // Check if a name arlready exists
 
-const names = persons.map((person) => person.name.toLocaleLowerCase());
+// const names = persons.map((person) => person.name.toLocaleLowerCase());
 const isNameTaken = (name) => names.includes(name.toLocaleLowerCase());
 
 // Check if a name arlready exists
@@ -43,25 +25,6 @@ app.use(
     ":method :url :status :res[content-length] - :response-time ms :res-body"
   )
 );
-// app.use(morgan("tiny"));
-
-app.post("/api/persons", (req, res) => {
-  const { name, number } = req.body;
-  if (!name || !number || typeof number !== "number") {
-    return res.status(400).json({ error: "Name or number missing" });
-  }
-  if (isNameTaken(name)) {
-    return res.status(400).json({ error: "Name must be unique" });
-  }
-  const person = {
-    id: Math.floor(Math.random() * 100000),
-    name,
-    number,
-  };
-
-  persons = persons.concat(person);
-  res.json(person);
-});
 
 app.get("/", (req, res) => {
   return res.send("Hello Full Stack Open 2022!");
@@ -74,7 +37,9 @@ app.get("/info", (req, res) => {
 });
 
 app.get("/api/persons", (req, res) => {
-  res.json(persons);
+  Person.find({})
+    .then((people) => res.json(people))
+    .catch((error) => console.log(error.message));
 });
 
 app.get("/api/persons/:id", (req, res) => {
@@ -97,6 +62,28 @@ app.delete("/api/persons/:id", (req, res) => {
   } else {
     return res.status(204).end();
   }
+});
+
+app.post("/api/persons", async (req, res) => {
+  const { name, number } = req.body;
+  // is this still working??? I don't think so -- testing later
+  // if (!name || !number || typeof number !== "number") {
+  //   return res.status(400).json({ error: "Name or number missing" });
+  // }
+  // if (isNameTaken(name)) {
+  //   return res.status(400).json({ error: "Name must be unique" });
+  // }
+  const person = new Person({
+    name,
+    number,
+    date: new Date(),
+  });
+  person.save().then((result) => {
+    console.log("Person saved!");
+    console.log("result", result);
+  });
+
+  res.json(person);
 });
 
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
