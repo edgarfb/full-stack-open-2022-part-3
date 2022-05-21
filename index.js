@@ -66,7 +66,7 @@ app.delete("/api/persons/:id", (req, res) => {
 
 app.post("/api/persons", async (req, res) => {
   const { name, number } = req.body;
-  // is this still working???
+  // is this still working??? I don't think so -- testing later
   // if (!name || !number || typeof number !== "number") {
   //   return res.status(400).json({ error: "Name or number missing" });
   // }

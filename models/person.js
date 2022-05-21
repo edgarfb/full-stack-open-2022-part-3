@@ -26,10 +26,8 @@ personSchema.set("toJSON", {
 
 const Person = mongoose.model("Person", personSchema);
 
-const getAll = () => {
-  const person = new Person({});
-  return person.find({});
-};
+// The db connection is always open?
+
 // this could be an option --- I need to check it out
 // const addNewPerson = (name, number) => {
 //   const person = new Person({
