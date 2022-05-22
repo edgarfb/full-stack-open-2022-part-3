@@ -8,8 +8,6 @@ const PORT = process.env.PORT || 5000;
 const Person = require("./models/person");
 // const addNewPerson = require("./models/person");
 
-console.log(Person);
-
 // Check if a name arlready exists
 
 // const names = persons.map((person) => person.name.toLocaleLowerCase());
@@ -30,6 +28,7 @@ app.get("/", (req, res) => {
   return res.send("Hello Full Stack Open 2022!");
 });
 
+// FIXME: persons does not exist here ???
 app.get("/info", (req, res) => {
   const date = new Date();
   const info = `<p>Phonebook has info for ${persons.length} people</p> <p>${date}</p>`;
@@ -42,31 +41,30 @@ app.get("/api/persons", (req, res) => {
     .catch((error) => console.log(error.message));
 });
 
-app.get("/api/persons/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const person = persons.find((person) => person.id === id);
-  if (person) {
+app.get("/api/persons/:id", async (req, res, next) => {
+  const id = req.params.id;
+  try {
+    const person = await Person.findById(id);
     return res.status(200).json(person);
-  } else {
-    return res.status(404).end();
+  } catch (error) {
+    next(error);
   }
 });
 
-app.delete("/api/persons/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const person = persons.find((person) => person.id === id);
-  console.log("person", person);
-  if (person) {
-    persons = persons.filter((person) => person.id !== id);
+app.delete("/api/persons/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const person = await Person.findByIdAndRemove(id);
     return res.status(204).end();
-  } else {
-    return res.status(204).end();
+  } catch (error) {
+    console.log(error);
   }
 });
 
 app.post("/api/persons", async (req, res) => {
   const { name, number } = req.body;
-  // is this still working??? I don't think so -- testing later
+  //  FIXME:  is this still working??? I don't think so -- testing later
+
   // if (!name || !number || typeof number !== "number") {
   //   return res.status(400).json({ error: "Name or number missing" });
   // }
@@ -85,5 +83,9 @@ app.post("/api/persons", async (req, res) => {
 
   res.json(person);
 });
+
+// TODO: - add unknowEndPoint middleware
+
+// TODO: - add error handler middleware
 
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
