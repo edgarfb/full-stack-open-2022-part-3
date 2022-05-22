@@ -35,10 +35,13 @@ app.get("/info", (req, res) => {
   res.send(info);
 });
 
-app.get("/api/persons", (req, res) => {
-  Person.find({})
-    .then((people) => res.json(people))
-    .catch((error) => console.log(error.message));
+app.get("/api/persons", async (req, res, next) => {
+  try {
+    const persons = await Person.find({});
+    return res.status(200).json(persons);
+  } catch (error) {
+    next(error);
+  }
 });
 
 app.get("/api/persons/:id", async (req, res, next) => {
@@ -51,17 +54,17 @@ app.get("/api/persons/:id", async (req, res, next) => {
   }
 });
 
-app.delete("/api/persons/:id", async (req, res) => {
+app.delete("/api/persons/:id", async (req, res, next) => {
   const id = req.params.id;
   try {
     const person = await Person.findByIdAndRemove(id);
     return res.status(204).end();
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 });
 
-app.post("/api/persons", async (req, res) => {
+app.post("/api/persons", async (req, res, next) => {
   const { name, number } = req.body;
   //  FIXME:  is this still working??? I don't think so -- testing later
 
@@ -70,22 +73,32 @@ app.post("/api/persons", async (req, res) => {
   // }
   // if (isNameTaken(name)) {
   //   return res.status(400).json({ error: "Name must be unique" });
-  // }
-  const person = new Person({
-    name,
-    number,
-    date: new Date(),
-  });
-  person.save().then((result) => {
-    console.log("Person saved!");
-    console.log("result", result);
-  });
+  try {
+    const person = new Person({
+      name,
+      number,
+      date: new Date(),
+    });
+    person.save().then((result) => {
+      console.log("Person saved!");
+      console.log("result", result);
+    });
 
-  res.json(person);
+    res.json(person);
+  } catch (error) {
+    next(error);
+  }
+  // }
 });
 
 // TODO: - add unknowEndPoint middleware
 
 // TODO: - add error handler middleware
+
+const errorHandler = (error, req, res, next) => {
+  console.log(error);
+  return res.status(500).send("Something broke!");
+};
+app.use(errorHandler);
 
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
