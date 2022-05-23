@@ -64,36 +64,56 @@ app.delete("/api/persons/:id", async (req, res, next) => {
   }
 });
 
+const checkName = async (req, res, next) => {
+  const nameTaken = await Person.findOne({ name: req.body.name });
+  console.log("nameTaken", nameTaken);
+  next();
+};
+
+app.use("/api/persons", checkName);
+
+// I used a POST here to create and update. This is ok? I'm not quite sure...
+// If you come across white this comment and know the answer please let me know :)
 app.post("/api/persons", async (req, res, next) => {
   const { name, number } = req.body;
-  //  FIXME:  is this still working??? I don't think so -- testing later
-
-  // if (!name || !number || typeof number !== "number") {
-  //   return res.status(400).json({ error: "Name or number missing" });
-  // }
-  // if (isNameTaken(name)) {
-  //   return res.status(400).json({ error: "Name must be unique" });
   try {
     const person = new Person({
       name,
       number,
       date: new Date(),
     });
-    person.save().then((result) => {
-      console.log("Person saved!");
-      console.log("result", result);
-    });
 
-    res.json(person);
+    const isNameTaken = await Person.findOne({ name: person.name });
+
+    if (isNameTaken) {
+      await Person.findOneAndUpdate({ name: person.name }, { number });
+      res.status(204).send("Data updated!");
+    } else {
+      person.save().then((result) => {
+        console.log("Person saved!");
+        console.log("result", result);
+      });
+
+      res.json(person);
+    }
   } catch (error) {
     next(error);
   }
-  // }
 });
 
-// TODO: - add unknowEndPoint middleware
+// app.put("/api/persons/:id", async (req, res, next) => {
+//   // find a person
+//   const id = req.params.id;
+//   try {
+//     const isPersonExist = await Person.findById(id);
+//     console.log(isPersonExist);
+//     res.send(isPersonExist);
+//   } catch (error) {
+//     next(error);
+//   }
+// });
 
-// TODO: - add error handler middleware
+// TODO: - add unknowEndPoint middleware
 
 const errorHandler = (error, req, res, next) => {
   console.log(error);
