@@ -13,8 +13,8 @@
   "devDependencies": {},
   "scripts": {
     "start": "node index.js",
-    "open": "start chrome https://fullstackopen.com/en/#course-contents https://github.com/edgarfb/full-stack-open-2022-part-3 http://localhost:5000",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    
+    "test": "echo \"Error: no test specified\" && exit 1",
   },
   "author": "Edgar Fernando Britez",
   "license": "ISC"
