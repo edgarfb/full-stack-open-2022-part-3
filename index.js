@@ -6,11 +6,9 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 const Person = require("./models/person");
-// const addNewPerson = require("./models/person");
 
 // Check if a name arlready exists
 
-// const names = persons.map((person) => person.name.toLocaleLowerCase());
 const isNameTaken = (name) => names.includes(name.toLocaleLowerCase());
 
 // Check if a name arlready exists
