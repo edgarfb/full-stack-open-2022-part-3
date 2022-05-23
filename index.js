@@ -28,9 +28,9 @@ app.get("/", (req, res) => {
   return res.send("Hello Full Stack Open 2022!");
 });
 
-// FIXME: persons does not exist here ???
-app.get("/info", (req, res) => {
+app.get("/info", async (req, res) => {
   const date = new Date();
+  const persons = await Person.find({});
   const info = `<p>Phonebook has info for ${persons.length} people</p> <p>${date}</p>`;
   res.send(info);
 });
@@ -54,6 +54,7 @@ app.get("/api/persons/:id", async (req, res, next) => {
   }
 });
 
+// I did it in a previous coding session
 app.delete("/api/persons/:id", async (req, res, next) => {
   const id = req.params.id;
   try {
@@ -63,14 +64,6 @@ app.delete("/api/persons/:id", async (req, res, next) => {
     next(error);
   }
 });
-
-const checkName = async (req, res, next) => {
-  const nameTaken = await Person.findOne({ name: req.body.name });
-  console.log("nameTaken", nameTaken);
-  next();
-};
-
-app.use("/api/persons", checkName);
 
 // I used a POST here to create and update. This is ok? I'm not quite sure...
 // If you come across white this comment and know the answer please let me know :)
