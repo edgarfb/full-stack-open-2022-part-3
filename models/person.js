@@ -26,20 +26,4 @@ personSchema.set("toJSON", {
 
 const Person = mongoose.model("Person", personSchema);
 
-// The db connection is always open?
-
-// this could be an option --- I need to check it out
-// const addNewPerson = (name, number) => {
-//   const person = new Person({
-//     name,
-//     number,
-//     date: new Date(),
-//   });
-//   person.save().then((result) => {
-//     console.log("Person saved!");
-//     console.log("result", result);
-//     mongoose.connection.close();
-//   });
-// };
-
 module.exports = Person;
