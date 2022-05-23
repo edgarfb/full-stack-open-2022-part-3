@@ -8,8 +8,6 @@ const PORT = process.env.PORT || 5000;
 const Person = require("./models/person");
 // const addNewPerson = require("./models/person");
 
-console.log(Person);
-
 // Check if a name arlready exists
 
 // const names = persons.map((person) => person.name.toLocaleLowerCase());
@@ -30,60 +28,90 @@ app.get("/", (req, res) => {
   return res.send("Hello Full Stack Open 2022!");
 });
 
-app.get("/info", (req, res) => {
+app.get("/info", async (req, res) => {
   const date = new Date();
+  const persons = await Person.find({});
   const info = `<p>Phonebook has info for ${persons.length} people</p> <p>${date}</p>`;
   res.send(info);
 });
 
-app.get("/api/persons", (req, res) => {
-  Person.find({})
-    .then((people) => res.json(people))
-    .catch((error) => console.log(error.message));
+app.get("/api/persons", async (req, res, next) => {
+  try {
+    const persons = await Person.find({});
+    return res.status(200).json(persons);
+  } catch (error) {
+    next(error);
+  }
 });
 
-app.get("/api/persons/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const person = persons.find((person) => person.id === id);
-  if (person) {
+app.get("/api/persons/:id", async (req, res, next) => {
+  const id = req.params.id;
+  try {
+    const person = await Person.findById(id);
     return res.status(200).json(person);
-  } else {
-    return res.status(404).end();
+  } catch (error) {
+    next(error);
   }
 });
 
-app.delete("/api/persons/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const person = persons.find((person) => person.id === id);
-  console.log("person", person);
-  if (person) {
-    persons = persons.filter((person) => person.id !== id);
+// I did it in a previous coding session
+app.delete("/api/persons/:id", async (req, res, next) => {
+  const id = req.params.id;
+  try {
+    const person = await Person.findByIdAndRemove(id);
     return res.status(204).end();
-  } else {
-    return res.status(204).end();
+  } catch (error) {
+    next(error);
   }
 });
 
-app.post("/api/persons", async (req, res) => {
+// I used a POST here to create and update. This is ok? I'm not quite sure...
+// If you come across white this comment and know the answer please let me know :)
+app.post("/api/persons", async (req, res, next) => {
   const { name, number } = req.body;
-  // is this still working??? I don't think so -- testing later
-  // if (!name || !number || typeof number !== "number") {
-  //   return res.status(400).json({ error: "Name or number missing" });
-  // }
-  // if (isNameTaken(name)) {
-  //   return res.status(400).json({ error: "Name must be unique" });
-  // }
-  const person = new Person({
-    name,
-    number,
-    date: new Date(),
-  });
-  person.save().then((result) => {
-    console.log("Person saved!");
-    console.log("result", result);
-  });
+  try {
+    const person = new Person({
+      name,
+      number,
+      date: new Date(),
+    });
 
-  res.json(person);
+    const isNameTaken = await Person.findOne({ name: person.name });
+
+    if (isNameTaken) {
+      await Person.findOneAndUpdate({ name: person.name }, { number });
+      res.status(204).send("Data updated!");
+    } else {
+      person.save().then((result) => {
+        console.log("Person saved!");
+        console.log("result", result);
+      });
+
+      res.json(person);
+    }
+  } catch (error) {
+    next(error);
+  }
 });
+
+// app.put("/api/persons/:id", async (req, res, next) => {
+//   // find a person
+//   const id = req.params.id;
+//   try {
+//     const isPersonExist = await Person.findById(id);
+//     console.log(isPersonExist);
+//     res.send(isPersonExist);
+//   } catch (error) {
+//     next(error);
+//   }
+// });
+
+// TODO: - add unknowEndPoint middleware
+
+const errorHandler = (error, req, res, next) => {
+  console.log(error);
+  return res.status(500).send("Something broke!");
+};
+app.use(errorHandler);
 
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));

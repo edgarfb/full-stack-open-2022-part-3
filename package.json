@@ -10,9 +10,13 @@
     "mongoose": "^6.3.3",
     "morgan": "^1.10.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "nodemon": "^2.0.16"
+  },
   "scripts": {
     "start": "node index.js",
+    "dev": "nodemon index.js",
+    "open": "start chrome https://fullstackopen.com/en/#course-contents https://github.com/edgarfb/full-stack-open-2022-part-3 http://localhost:5000",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Edgar Fernando Britez",
