@@ -6,10 +6,10 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 const Person = require("./models/person");
+const { default: mongoose } = require("mongoose");
 
 // Check if a name arlready exists
-
-const isNameTaken = (name) => names.includes(name.toLocaleLowerCase());
+const close = () => mongoose.connection.close();
 
 // Check if a name arlready exists
 app.use(cors());
@@ -63,52 +63,49 @@ app.delete("/api/persons/:id", async (req, res, next) => {
   }
 });
 
-// I used a POST here to create and update. This is ok? I'm not quite sure...
-// If you come across white this comment and know the answer please let me know :)
 app.post("/api/persons", async (req, res, next) => {
   const { name, number } = req.body;
-  try {
-    const person = new Person({
-      name,
-      number,
-      date: new Date(),
+
+  const person = new Person({
+    name,
+    number,
+    date: new Date(),
+  });
+  person
+    .save()
+    .then((personSaved) => {
+      console.log("here");
+      res.status(200).json(personSaved);
+    })
+    .catch((error) => {
+      console.log("here error", error);
+      next(error);
     });
-
-    const isNameTaken = await Person.findOne({ name: person.name });
-
-    if (isNameTaken) {
-      await Person.findOneAndUpdate({ name: person.name }, { number });
-      res.status(204).send("Data updated!");
-    } else {
-      person.save().then((result) => {
-        console.log("Person saved!");
-        console.log("result", result);
-      });
-
-      res.json(person);
-    }
-  } catch (error) {
-    next(error);
-  }
 });
 
-// app.put("/api/persons/:id", async (req, res, next) => {
-//   // find a person
-//   const id = req.params.id;
-//   try {
-//     const isPersonExist = await Person.findById(id);
-//     console.log(isPersonExist);
-//     res.send(isPersonExist);
-//   } catch (error) {
-//     next(error);
-//   }
-// });
+app.put("/api/persons/:id", async (req, res, next) => {
+  const id = req.params.id;
+  const { number } = req.body;
+  // {runValidators: true} it is enable valdator here
+  Person.findByIdAndUpdate(id, { number }, { runValidators: true })
+    .then((updatedPerson) =>
+      res.status(200).send({ message: "Data Updated", newData: updatedPerson })
+    )
+    .catch((error) => next(error));
+});
 
 // TODO: - add unknowEndPoint middleware
 
 const errorHandler = (error, req, res, next) => {
-  console.log(error);
-  return res.status(500).send("Something broke!");
+  console.log("Error from Error Middleware", error);
+  if (error.name === "CastError") {
+    res.status(400).send({ error: error.message });
+  }
+  if (error.name === "ValidationError") {
+    console.log("ValidationError");
+    res.status(400).send({ error: error.message });
+  }
+  // return res.status(500).send("Something broke!");
 };
 app.use(errorHandler);
 
