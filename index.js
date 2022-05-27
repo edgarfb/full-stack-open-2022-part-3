@@ -4,14 +4,9 @@ const morgan = require("morgan");
 const cors = require("cors");
 const app = express();
 const PORT = process.env.PORT || 5000;
-
 const Person = require("./models/person");
-const { default: mongoose } = require("mongoose");
+const pata = "pata";
 
-// Check if a name arlready exists
-const close = () => mongoose.connection.close();
-
-// Check if a name arlready exists
 app.use(cors());
 app.use(express.static("build"));
 app.use(express.json());
@@ -56,7 +51,7 @@ app.get("/api/persons/:id", async (req, res, next) => {
 app.delete("/api/persons/:id", async (req, res, next) => {
   const id = req.params.id;
   try {
-    const person = await Person.findByIdAndRemove(id);
+    await Person.findByIdAndRemove(id);
     return res.status(204).end();
   } catch (error) {
     next(error);
@@ -105,7 +100,7 @@ const errorHandler = (error, req, res, next) => {
     console.log("ValidationError");
     res.status(400).send({ error: error.message });
   }
-  // return res.status(500).send("Something broke!");
+  // return res.status(500).send("Something broke!")
 };
 app.use(errorHandler);
 
